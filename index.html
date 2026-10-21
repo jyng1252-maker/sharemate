@@ -274,5 +274,171 @@
   <footer>
     <p>ShareMate &copy; 2026</p>
   </footer>
+  
+<script>
+  // Store the current group and expenses / 储存当前小组和开销
+  let group = {
+    name: "",
+    members: []
+  };
+
+  let expenses = [];
+
+  // Restore saved data when the page opens / 打开网页时恢复已保存的数据
+  try {
+    group = JSON.parse(localStorage.getItem("sharemateGroup")) || group;
+    expenses = JSON.parse(localStorage.getItem("sharemateExpenses")) || [];
+  } catch (error) {
+    console.error("Unable to load saved data:", error);
+  }
+
+  // Find page elements / 找到网页中的元素
+  const groupNameInput = document.getElementById("groupName");
+  const membersInput = document.getElementById("members");
+  const createGroupBtn = document.getElementById("createGroupBtn");
+
+  const expenseNameInput = document.getElementById("expenseName");
+  const expenseAmountInput = document.getElementById("expenseAmount");
+  const payerSelect = document.getElementById("payer");
+  const addExpenseBtn = document.getElementById("addExpenseBtn");
+
+  const expenseList = document.getElementById("expenseList");
+  const totalExpensesElement = document.getElementById("totalExpenses");
+
+  // Create a group status message / 创建小组状态提示
+  const groupStatus = document.createElement("p");
+  createGroupBtn.insertAdjacentElement("afterend", groupStatus);
+
+  // Save data in this browser / 将数据保存在当前浏览器
+  function saveData() {
+    localStorage.setItem("sharemateGroup", JSON.stringify(group));
+    localStorage.setItem("sharemateExpenses", JSON.stringify(expenses));
+  }
+
+  // Fill the payer dropdown with group members / 将成员加入付款人下拉选单
+  function updatePayerOptions() {
+    payerSelect.replaceChildren();
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Select a payer";
+    payerSelect.appendChild(placeholder);
+
+    group.members.forEach(function (member) {
+      const option = document.createElement("option");
+      option.value = member;
+      option.textContent = member;
+      payerSelect.appendChild(option);
+    });
+  }
+
+  // Create a new group / 创建新小组
+  createGroupBtn.addEventListener("click", function () {
+    const name = groupNameInput.value.trim();
+    const memberNames = membersInput.value
+      .split(",")
+      .map(function (member) {
+        return member.trim();
+      })
+      .filter(function (member) {
+        return member !== "";
+      });
+
+    if (!name || memberNames.length === 0) {
+      groupStatus.textContent =
+        "Please enter a group name and at least one member.";
+      return;
+    }
+
+    // Remove duplicate member names / 删除重复的成员名字
+    group = {
+      name: name,
+      members: [...new Set(memberNames)]
+    };
+
+    // Keep only expenses paid by existing group members
+    // 只保留由新小组现有成员付款的记录
+    expenses = expenses.filter(function (expense) {
+      return group.members.includes(expense.payer);
+    });
+
+    updatePayerOptions();
+    saveData();
+    renderExpenses();
+
+    groupStatus.textContent =
+      "Group created: " + group.name +
+      " (" + group.members.length + " members)";
+  });
+
+  // Add an expense / 添加一笔开销
+  addExpenseBtn.addEventListener("click", function () {
+    const name = expenseNameInput.value.trim();
+    const amount = Number(expenseAmountInput.value);
+    const payer = payerSelect.value;
+
+    if (group.members.length === 0) {
+      alert("Please create a group first.");
+      return;
+    }
+
+    if (!name || !Number.isFinite(amount) || amount <= 0 || !payer) {
+      alert("Please enter a valid expense name, amount, and payer.");
+      return;
+    }
+
+    // Store the new expense / 储存新的开销记录
+    expenses.push({
+      id: Date.now(),
+      name: name,
+      amount: Math.round(amount * 100) / 100,
+      payer: payer
+    });
+
+    saveData();
+    renderExpenses();
+
+    // Clear the form after adding / 添加后清空表格
+    expenseNameInput.value = "";
+    expenseAmountInput.value = "";
+    payerSelect.value = "";
+  });
+
+  // Display expenses and calculate the total / 显示开销并计算总额
+  function renderExpenses() {
+    expenseList.replaceChildren();
+
+    expenses.forEach(function (expense) {
+      const item = document.createElement("li");
+      item.textContent =
+        expense.name + " — RM " + expense.amount.toFixed(2) +
+        " | Paid by: " + expense.payer;
+      expenseList.appendChild(item);
+    });
+
+    const total = expenses.reduce(function (sum, expense) {
+      return sum + expense.amount;
+    }, 0);
+
+    totalExpensesElement.textContent = "RM " + total.toFixed(2);
+  }
+
+  // Restore the group details on page load / 网页开启时恢复小组资料
+  if (group.name && group.members.length > 0) {
+    groupNameInput.value = group.name;
+    membersInput.value = group.members.join(", ");
+    updatePayerOptions();
+
+    groupStatus.textContent =
+      "Current group: " + group.name +
+      " (" + group.members.length + " members)";
+  }
+
+  // Show saved expenses on page load / 网页开启时显示已保存的开销
+  renderExpenses();
+</script>
+</body>
+</html>
+
 </body>
 </html>
