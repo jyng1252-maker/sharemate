@@ -13,218 +13,186 @@
   <title>ShareMate - Shared Expenses</title>
 
   <!-- CSS styles / 网页样式 -->
-  <style>
-    /* Design tokens / 统一管理颜色和圆角 */
-    :root {
-      --bg: #f5f6f8;
-      --surface: #ffffff;
-      --text: #20252d;
-      --muted: #737b87;
-      --border: #e4e7ec;
-      --primary: #315efb;
-      --primary-hover: #244bd0;
-      --radius: 16px;
-    }
+ 
+<style>
+  /* Shared design colors / 全站共用的颜色 */
+  :root {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --text: #20252d;
+    --muted: #737b87;
+    --border: #e4e7ec;
+    --primary: #315efb;
+    --primary-hover: #244bd0;
+  }
 
-    /* Consistent sizing / 统一元素尺寸计算方式 */
-    * {
-      box-sizing: border-box;
-    }
+  /* Consistent element sizing / 统一元素尺寸计算 */
+  * {
+    box-sizing: border-box;
+  }
 
-    /* Main page / 页面整体 */
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 16px;
-      line-height: 1.6;
-    }
+  /* Main page / 页面整体 */
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
 
-    /* Header / 顶部区域 */
+  /* Header layout / 顶部布局 */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 25px;
+  }
+
+  header p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  /* Center the main content / 将主内容居中 */
+  main {
+    width: min(100% - 32px, 720px);
+    margin: 32px auto;
+  }
+
+  /* White cards / 白色内容卡片 */
+  section {
+    margin-bottom: 20px;
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 3px 12px rgba(20, 30, 50, 0.03);
+  }
+
+  /* Section headings / 区块标题 */
+  h2 {
+    margin: 0 0 18px;
+    font-size: 19px;
+  }
+
+  /* Form labels / 输入说明 */
+  label {
+    display: block;
+    margin: 14px 0 6px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  /* Inputs and dropdowns / 输入框和下拉选单 */
+  input,
+  select {
+    display: block;
+    width: 100%;
+    min-height: 46px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: white;
+    color: var(--text);
+    font: inherit;
+  }
+
+  /* Focus effect / 输入时的高亮效果 */
+  input:focus,
+  select:focus {
+    outline: 2px solid rgba(49, 94, 251, 0.25);
+    border-color: var(--primary);
+  }
+
+  /* Primary buttons / 主要按钮 */
+  button {
+    display: block;
+    width: 100%;
+    min-height: 46px;
+    margin-top: 16px;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 10px;
+    background: var(--primary);
+    color: white;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  button:hover {
+    background: var(--primary-hover);
+  }
+
+  /* Expense and settlement lists / 开销与结算列表 */
+  ul {
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    overflow-wrap: anywhere;
+  }
+
+  li:last-child {
+    border-bottom: none;
+  }
+
+  /* Total amount / 总开销 */
+  #totalExpenses {
+    color: var(--primary);
+    font-size: 22px;
+  }
+
+  /* Footer / 页面底部 */
+  footer {
+    padding: 24px 16px;
+    color: var(--muted);
+    text-align: center;
+    font-size: 13px;
+  }
+
+  /* Mobile layout / 手机屏幕布局 */
+  @media (max-width: 600px) {
     header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 16px;
-      padding: 22px max(20px, calc((100% - 960px) / 2));
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
+      padding: 16px;
     }
 
     header h1 {
-      margin: 0;
-      font-size: 25px;
-      letter-spacing: -0.8px;
-    }
-
-    header p {
-      margin: 2px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    /* Main content / 主内容宽度 */
-    main {
-      width: min(100% - 32px, 720px);
-      margin: 36px auto;
-    }
-
-    /* Content cards / 内容卡片 */
-    section {
-      margin-bottom: 22px;
-      padding: 24px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: 0 3px 12px rgba(20, 30, 50, 0.03);
-    }
-
-    /* Section headings / 区块标题 */
-    h2 {
-      margin: 0 0 20px;
-      font-size: 19px;
-      letter-spacing: -0.3px;
-    }
-
-    /* Form labels / 输入框说明文字 */
-    label {
-      display: block;
-      margin: 16px 0 7px;
-      color: var(--text);
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    /* Input fields and dropdowns / 输入框和下拉选单 */
-    input,
-    select {
-      display: block;
-      width: 100%;
-      min-height: 46px;
-      padding: 11px 13px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--surface);
-      color: var(--text);
-      font: inherit;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    input::placeholder {
-      color: #a0a6b0;
-    }
-
-    /* Focus state / 输入时的高亮效果 */
-    input:focus,
-    select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(49, 94, 251, 0.12);
-    }
-
-    /* Buttons / 按钮基础样式 */
-    button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      min-height: 46px;
-      margin-top: 18px;
-      padding: 12px 16px;
-      border: none;
-      border-radius: 10px;
-      background: var(--primary);
-      color: #ffffff;
-      font: inherit;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-    }
-
-    /* Button hover effect / 鼠标悬停效果 */
-    button:hover {
-      background: var(--primary-hover);
-    }
-
-    button:active {
-      transform: scale(0.99);
-    }
-
-    /* Expense and settlement lists / 开销及结算列表 */
-    ul {
-      padding: 0;
-      list-style: none;
-    }
-
-    /* List items / 列表项目 */
-    li {
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-      overflow-wrap: anywhere;
-    }
-
-    li:last-child {
-      border-bottom: none;
-    }
-
-    /* Total expenses / 总开销数字 */
-    #totalExpenses {
-      color: var(--primary);
       font-size: 22px;
     }
 
-    /* Footer / 页面底部 */
-    footer {
-      padding: 24px 16px;
-      color: var(--muted);
-      text-align: center;
-      font-size: 13px;
+    main {
+      width: calc(100% - 24px);
+      margin: 20px auto;
     }
 
-    /* Tablet and mobile / 平板和手机布局 */
-    @media (max-width: 600px) {
-      header {
-        padding: 18px 16px;
-      }
-
-      header h1 {
-        font-size: 22px;
-      }
-
-      main {
-        width: calc(100% - 24px);
-        margin: 20px auto;
-      }
-
-      section {
-        padding: 18px;
-        margin-bottom: 16px;
-        border-radius: 13px;
-      }
-
-      h2 {
-        font-size: 18px;
-      }
-
-      input,
-      select,
-      button {
-        min-height: 48px;
-      }
+    section {
+      padding: 18px;
+      margin-bottom: 16px;
     }
 
-    /* Respect reduced-motion preferences / 尊重用户减少动画的设置 */
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        scroll-behavior: auto !important;
-        transition: none !important;
-      }
+    input,
+    select,
+    button {
+      min-height: 48px;
     }
-  </style>
+  }
+</style>
 </head>
 
 
